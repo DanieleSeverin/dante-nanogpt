@@ -59,8 +59,16 @@ and do **not** exist in the repo until the scripts are run.
       Colab / locally. Add www.gutenberg.org to the allowlist to run it here.)
 - [x] Add a Colab notebook (notebooks/dante_nanogpt.ipynb: clone → install →
       prepare → train → sample) + "Open in Colab" badge wired in README
-- [ ] GitHub Action: lint/format (ruff/black) on push
+- [~] GitHub Action: lint/format (ruff/black) on push
+      (ruff.toml added and all code reformatted to pass `ruff check` +
+      `ruff format --check`. The workflow file itself could NOT be pushed
+      from this environment: the OAuth app lacks the `workflow` scope and the
+      GitHub MCP app lacks "Workflows" permission, so .github/workflows/*
+      writes are rejected. The ready-to-use YAML lives in this repo's chat
+      history / local working tree as .github/workflows/lint.yml — add it via
+      the GitHub web UI, or push it from a local clone with workflow scope.)
 - [ ] GitHub Action: CPU smoke test (few steps, tiny config) on push/PR
+      (note: same .github/workflows/ permission limitation applies)
 - [ ] Real training run on Colab GPU; save sample generations
       (e.g. samples/ folder or README section)
 - [ ] (Optional) hyperparameter experiments, document results in README
