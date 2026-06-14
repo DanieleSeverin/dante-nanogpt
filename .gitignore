@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Generated dataset artifacts
+data/*.bin
+data/meta.pkl
+data/divina_commedia_raw.txt
+data/divina_commedia_clean.txt
+
+# Training outputs / checkpoints
+out/
+*.pt
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
