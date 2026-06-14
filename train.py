@@ -33,12 +33,11 @@ DEFAULTS = dict(
     # I/O
     data_dir="data",
     out_dir="out",
-    eval_interval=250,      # how often to evaluate + maybe checkpoint
-    log_interval=10,        # how often to print the training loss
-    eval_iters=100,         # batches used to estimate the loss
-    sample_interval=500,    # how often to print a generated sample
+    eval_interval=250,  # how often to evaluate + maybe checkpoint
+    log_interval=10,  # how often to print the training loss
+    eval_iters=100,  # batches used to estimate the loss
+    sample_interval=500,  # how often to print a generated sample
     always_save_checkpoint=False,
-
     # data / model
     block_size=256,
     batch_size=32,
@@ -46,7 +45,6 @@ DEFAULTS = dict(
     n_head=6,
     n_embd=384,
     dropout=0.1,
-
     # optimizer
     learning_rate=3e-4,
     max_iters=5000,
@@ -54,25 +52,26 @@ DEFAULTS = dict(
     beta1=0.9,
     beta2=0.99,
     grad_clip=1.0,
-
     # learning-rate schedule (cosine decay with warmup)
     decay_lr=True,
     warmup_iters=100,
     min_lr=3e-5,
-
     # system
     device="cuda" if torch.cuda.is_available() else "cpu",
     seed=1337,
-    compile=False,          # set True with PyTorch 2.0 for a speedup
+    compile=False,  # set True with PyTorch 2.0 for a speedup
 )
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train the Dante GPT.")
+
+    def str2bool(x):
+        return x.lower() in ("1", "true", "yes")
+
     for key, val in DEFAULTS.items():
         if isinstance(val, bool):
-            parser.add_argument(f"--{key}", type=lambda x: x.lower() in ("1", "true", "yes"),
-                                default=val)
+            parser.add_argument(f"--{key}", type=str2bool, default=val)
         else:
             parser.add_argument(f"--{key}", type=type(val), default=val)
     return parser.parse_args()
@@ -94,28 +93,41 @@ def main():
     meta_path = os.path.join(data_dir, "meta.pkl")
     if not os.path.exists(meta_path):
         raise FileNotFoundError(
-            f"{meta_path} not found. Run `python data/prepare.py` first.")
+            f"{meta_path} not found. Run `python data/prepare.py` first."
+        )
     with open(meta_path, "rb") as f:
         meta = pickle.load(f)
     vocab_size = meta["vocab_size"]
     itos = meta["itos"]
     print(f"Loaded vocabulary of {vocab_size} characters.")
 
-    train_data = np.memmap(os.path.join(data_dir, "train.bin"),
-                           dtype=np.uint16, mode="r")
-    val_data = np.memmap(os.path.join(data_dir, "val.bin"),
-                         dtype=np.uint16, mode="r")
+    train_data = np.memmap(
+        os.path.join(data_dir, "train.bin"), dtype=np.uint16, mode="r"
+    )
+    val_data = np.memmap(os.path.join(data_dir, "val.bin"), dtype=np.uint16, mode="r")
 
     def get_batch(split):
         data = train_data if split == "train" else val_data
         ix = torch.randint(len(data) - cfg["block_size"], (cfg["batch_size"],))
-        x = torch.stack([torch.from_numpy(
-            (data[i:i + cfg["block_size"]]).astype(np.int64)) for i in ix])
-        y = torch.stack([torch.from_numpy(
-            (data[i + 1:i + 1 + cfg["block_size"]]).astype(np.int64)) for i in ix])
+        x = torch.stack(
+            [
+                torch.from_numpy((data[i : i + cfg["block_size"]]).astype(np.int64))
+                for i in ix
+            ]
+        )
+        y = torch.stack(
+            [
+                torch.from_numpy(
+                    (data[i + 1 : i + 1 + cfg["block_size"]]).astype(np.int64)
+                )
+                for i in ix
+            ]
+        )
         if device_type == "cuda":
-            x, y = x.pin_memory().to(device, non_blocking=True), \
-                   y.pin_memory().to(device, non_blocking=True)
+            x, y = (
+                x.pin_memory().to(device, non_blocking=True),
+                y.pin_memory().to(device, non_blocking=True),
+            )
         else:
             x, y = x.to(device), y.to(device)
         return x, y
@@ -124,8 +136,11 @@ def main():
     # Model
     # ------------------------------------------------------------------
     model_args = dict(
-        n_layer=cfg["n_layer"], n_head=cfg["n_head"], n_embd=cfg["n_embd"],
-        block_size=cfg["block_size"], dropout=cfg["dropout"],
+        n_layer=cfg["n_layer"],
+        n_head=cfg["n_head"],
+        n_embd=cfg["n_embd"],
+        block_size=cfg["block_size"],
+        dropout=cfg["dropout"],
         vocab_size=vocab_size,
     )
     gptconf = GPTConfig(**model_args)
@@ -133,8 +148,11 @@ def main():
     model.to(device)
 
     optimizer = model.configure_optimizers(
-        cfg["weight_decay"], cfg["learning_rate"],
-        (cfg["beta1"], cfg["beta2"]), device_type)
+        cfg["weight_decay"],
+        cfg["learning_rate"],
+        (cfg["beta1"], cfg["beta2"]),
+        device_type,
+    )
 
     if cfg["compile"]:
         print("Compiling the model (this may take a minute)...")
@@ -143,8 +161,11 @@ def main():
     # Mixed precision on CUDA for speed/memory; plain float32 on CPU.
     use_amp = device_type == "cuda"
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
-    ctx = (torch.autocast(device_type=device_type, dtype=torch.bfloat16)
-           if use_amp else _nullcontext())
+    ctx = (
+        torch.autocast(device_type=device_type, dtype=torch.bfloat16)
+        if use_amp
+        else _nullcontext()
+    )
 
     @torch.no_grad()
     def estimate_loss():
@@ -169,8 +190,9 @@ def main():
         if it > cfg["max_iters"]:
             return cfg["min_lr"]
         # 3) cosine decay in between
-        decay_ratio = (it - cfg["warmup_iters"]) / \
-            (cfg["max_iters"] - cfg["warmup_iters"])
+        decay_ratio = (it - cfg["warmup_iters"]) / (
+            cfg["max_iters"] - cfg["warmup_iters"]
+        )
         coeff = 0.5 * (1.0 + np.cos(np.pi * decay_ratio))
         return cfg["min_lr"] + coeff * (cfg["learning_rate"] - cfg["min_lr"])
 
@@ -199,14 +221,17 @@ def main():
         # Periodic evaluation + checkpointing.
         if it % cfg["eval_interval"] == 0:
             losses = estimate_loss()
-            print(f"step {it}: train loss {losses['train']:.4f}, "
-                  f"val loss {losses['val']:.4f}, lr {lr:.2e}")
+            print(
+                f"step {it}: train loss {losses['train']:.4f}, "
+                f"val loss {losses['val']:.4f}, lr {lr:.2e}"
+            )
             if losses["val"] < best_val_loss or cfg["always_save_checkpoint"]:
                 best_val_loss = min(best_val_loss, losses["val"])
                 if it > 0:
                     checkpoint = {
-                        "model": (model._orig_mod if hasattr(model, "_orig_mod")
-                                  else model).state_dict(),
+                        "model": (
+                            model._orig_mod if hasattr(model, "_orig_mod") else model
+                        ).state_dict(),
                         "optimizer": optimizer.state_dict(),
                         "model_args": model_args,
                         "iter_num": it,
@@ -238,8 +263,10 @@ def main():
         if it % cfg["log_interval"] == 0:
             dt = time.time() - t0
             t0 = time.time()
-            print(f"iter {it}: loss {loss.item():.4f}, "
-                  f"time {dt * 1000 / max(1, cfg['log_interval']):.1f}ms/iter")
+            print(
+                f"iter {it}: loss {loss.item():.4f}, "
+                f"time {dt * 1000 / max(1, cfg['log_interval']):.1f}ms/iter"
+            )
 
     print("Training complete.")
     print(f"Best validation loss: {best_val_loss:.4f}")
