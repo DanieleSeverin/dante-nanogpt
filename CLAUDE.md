@@ -51,7 +51,13 @@ and do **not** exist in the repo until the scripts are run.
   the goal is learning
 
 ## Roadmap (update checkboxes as items are completed)
-- [ ] Validate data/prepare.py end-to-end, confirm clean train/val splits
+- [~] Validate data/prepare.py end-to-end, confirm clean train/val splits
+      (clean/encode/split logic validated via a smoke test; fixed a bug where
+      whole footnote-definition lines like "[1] note text" were not removed.
+      The real download is still pending: gutenberg.org is NOT in this
+      environment's network egress allowlist, so prepare.py can't fetch the
+      text here. Add www.gutenberg.org to the allowlist to run it for real,
+      or run prepare.py locally / on Colab.)
 - [ ] Add a Colab notebook (e.g. via jupytext from train.py) + "Open in
       Colab" badge in README
 - [ ] GitHub Action: lint/format (ruff/black) on push

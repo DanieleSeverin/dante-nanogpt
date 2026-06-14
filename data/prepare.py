@@ -95,6 +95,11 @@ def clean(text: str) -> str:
         if re.fullmatch(r"[\[\(]\d+[\]\)]", stripped):
             continue
 
+        # Skip whole footnote/endnote definition lines, which begin with a
+        # marker followed by the note text, e.g. "[1] questa è una nota...".
+        if re.match(r"^\s*[\[\(]\d+[\]\)]\s+\S", line):
+            continue
+
         # Skip lines that are only digits (page or verse numbers).
         if re.fullmatch(r"\d+", stripped):
             continue
