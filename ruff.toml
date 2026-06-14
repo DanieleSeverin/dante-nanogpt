@@ -1,0 +1,14 @@
+# Ruff configuration for dante-nanogpt.
+# Keep it light and beginner-friendly: standard line length, a small set of
+# sensible lint rules, and Ruff's formatter for consistent style.
+
+line-length = 88
+target-version = "py39"
+
+# Don't lint generated notebooks' style aggressively or build outputs.
+extend-exclude = ["out", "notebooks"]
+
+[lint]
+# E/W: pycodestyle, F: pyflakes, I: import sorting, UP: pyupgrade,
+# B: flake8-bugbear (common pitfalls).
+select = ["E", "W", "F", "I", "UP", "B"]

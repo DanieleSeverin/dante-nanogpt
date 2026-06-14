@@ -40,7 +40,7 @@ def download(url: str, dest: str) -> str:
     """Download ``url`` to ``dest`` (cached: skips if already present)."""
     if os.path.exists(dest):
         print(f"Raw text already downloaded at {dest}, skipping download.")
-        with open(dest, "r", encoding="utf-8") as f:
+        with open(dest, encoding="utf-8") as f:
             return f.read()
 
     print(f"Downloading Divine Comedy text from {url} ...")
@@ -58,17 +58,19 @@ def download(url: str, dest: str) -> str:
 
 def strip_gutenberg_boilerplate(text: str) -> str:
     """Remove the Project Gutenberg license header and footer."""
-    start_marker = re.compile(r"\*\*\*\s*START OF (THE|THIS) PROJECT GUTENBERG.*?\*\*\*",
-                              re.IGNORECASE)
-    end_marker = re.compile(r"\*\*\*\s*END OF (THE|THIS) PROJECT GUTENBERG.*?\*\*\*",
-                            re.IGNORECASE)
+    start_marker = re.compile(
+        r"\*\*\*\s*START OF (THE|THIS) PROJECT GUTENBERG.*?\*\*\*", re.IGNORECASE
+    )
+    end_marker = re.compile(
+        r"\*\*\*\s*END OF (THE|THIS) PROJECT GUTENBERG.*?\*\*\*", re.IGNORECASE
+    )
 
     start = start_marker.search(text)
     if start:
-        text = text[start.end():]
+        text = text[start.end() :]
     end = end_marker.search(text)
     if end:
-        text = text[:end.start()]
+        text = text[: end.start()]
     return text
 
 
@@ -93,6 +95,11 @@ def clean(text: str) -> str:
 
         # Skip footnote / editorial-note markers such as "[1]" or "(1)".
         if re.fullmatch(r"[\[\(]\d+[\]\)]", stripped):
+            continue
+
+        # Skip whole footnote/endnote definition lines, which begin with a
+        # marker followed by the note text, e.g. "[1] questa è una nota...".
+        if re.match(r"^\s*[\[\(]\d+[\]\)]\s+\S", line):
             continue
 
         # Skip lines that are only digits (page or verse numbers).
