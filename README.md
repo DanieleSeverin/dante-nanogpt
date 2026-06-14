@@ -1,7 +1,6 @@
 # Dante nanoGPT 🪶
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DanieleSeverin/dante-nanogpt/blob/main/notebooks/dante_nanogpt.ipynb)
-<!-- ⚠️ Placeholder badge: the Colab notebook (notebooks/dante_nanogpt.ipynb) will be added later. -->
 
 A small, from-scratch, **character-level transformer** (nanoGPT-style)
 trained on the text of Dante's *Divine Comedy* to generate verses in
@@ -160,10 +159,10 @@ python sample.py --temperature=0.7 --top_k=40
 
 ## ☁️ Run on Colab
 
-A Colab notebook will be added later under `notebooks/`. The badge at the
-top of this README is a **placeholder** for it — once the notebook is in
-place, clicking the badge will open the whole prepare → train → sample
-workflow on a free GPU.
+Click the **Open in Colab** badge at the top of this README to open
+[`notebooks/dante_nanogpt.ipynb`](notebooks/dante_nanogpt.ipynb), which walks
+through the whole prepare → train → sample workflow on a free GPU. Remember to
+enable the GPU runtime (**Runtime → Change runtime type → GPU**) before training.
 
 ---
 

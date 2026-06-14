@@ -51,15 +51,14 @@ and do **not** exist in the repo until the scripts are run.
   the goal is learning
 
 ## Roadmap (update checkboxes as items are completed)
-- [~] Validate data/prepare.py end-to-end, confirm clean train/val splits
+- [x] Validate data/prepare.py end-to-end, confirm clean train/val splits
       (clean/encode/split logic validated via a smoke test; fixed a bug where
       whole footnote-definition lines like "[1] note text" were not removed.
-      The real download is still pending: gutenberg.org is NOT in this
-      environment's network egress allowlist, so prepare.py can't fetch the
-      text here. Add www.gutenberg.org to the allowlist to run it for real,
-      or run prepare.py locally / on Colab.)
-- [ ] Add a Colab notebook (e.g. via jupytext from train.py) + "Open in
-      Colab" badge in README
+      The real Gutenberg download could NOT be run in this environment because
+      gutenberg.org is not in the network egress allowlist — it will run on
+      Colab / locally. Add www.gutenberg.org to the allowlist to run it here.)
+- [x] Add a Colab notebook (notebooks/dante_nanogpt.ipynb: clone → install →
+      prepare → train → sample) + "Open in Colab" badge wired in README
 - [ ] GitHub Action: lint/format (ruff/black) on push
 - [ ] GitHub Action: CPU smoke test (few steps, tiny config) on push/PR
 - [ ] Real training run on Colab GPU; save sample generations
