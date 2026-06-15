@@ -160,9 +160,20 @@ def main():
 
     # Mixed precision on CUDA for speed/memory; plain float32 on CPU.
     use_amp = device_type == "cuda"
-    scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
+    # Use bfloat16 only on GPUs that support it natively (Ampere, compute
+    # capability >= 8). On older cards like the Tesla T4 (Turing, cc 7.5)
+    # bfloat16 is emulated and very slow, so fall back to float16, which is
+    # hardware-accelerated there and several times faster.
+    if use_amp and torch.cuda.get_device_capability()[0] >= 8:
+        amp_dtype = torch.bfloat16
+    else:
+        amp_dtype = torch.float16
+    if use_amp:
+        print(f"Using mixed precision with dtype: {amp_dtype}")
+    # GradScaler is only needed for float16 (not for bfloat16 or float32).
+    scaler = torch.cuda.amp.GradScaler(enabled=(use_amp and amp_dtype == torch.float16))
     ctx = (
-        torch.autocast(device_type=device_type, dtype=torch.bfloat16)
+        torch.autocast(device_type=device_type, dtype=amp_dtype)
         if use_amp
         else _nullcontext()
     )
