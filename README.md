@@ -155,6 +155,9 @@ python sample.py --start="Nel mezzo del cammin di nostra vita"
 python sample.py --temperature=0.7 --top_k=40
 ```
 
+See [`samples/`](samples/) for example generations from a trained model, along
+with the hyperparameters and validation loss of that run.
+
 ---
 
 ## ☁️ Run on Colab
