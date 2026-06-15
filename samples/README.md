@@ -54,6 +54,80 @@ prediction.
 > reproduces Dante's tercet structure, archaic Italian forms (`m’eravam`,
 > `uscissi`), and the dialogue style (`Ed elli a me: «...`).
 
+### Generations from the best checkpoint (`sample.py`, val loss 1.3538)
+
+These come from the saved best checkpoint (iter 1500), not the overfit final
+step — the proper way to generate. Notice the consistent tercets, the
+archaic Italian, and the dialogue formulas (`Ed elli a me:`, `rispuosi al mio
+maestro`).
+
+Unconditional (`--num_samples=3 --temperature=0.8 --top_k=40`):
+
+```
+  prese di me sanza o vergogna femina.
+
+  A mirava il duca e ’l suo carro ammense,
+  fia li bellieri e giran lor con cenno,
+  desiderosi come giù s’appressa,
+
+  perché noi mi pensier dal fonte spense
+  l’amor nostri lor cotanto propriso,
+  che già mi starà con le sette vente.
+```
+
+```
+  Sì com’ io fui per una luce luce.
+
+  E al cominciò: «Che fu vergognata
+  natura l’umana sanza sua ratta;
+  onde giù parea colui che ti nuota.
+
+  L’onde ciò che di te fu altra guatti
+  vita la mia donna ciascun la via,
+  quale orribili da la gran s’appunta.
+```
+
+```
+  Io vidi un tormento ancor non canne;
+  basti la lingua m’era ben catelli
+  di retro a quel ch’io mi fei prima fénne.
+
+  similmente che la madre lor non ti parti,
+  che ’l primo secondo di questo vallo,
+  e però che fa sempre al gran piovvarsi.
+```
+
+Prompted with `--start="Nel mezzo del cammin di nostra vita"`:
+
+```
+Nel mezzo del cammin di nostra vita,
+  e tu mi fe’ in suso, e dissi: “Malebra!».
+
+  «La gran discende mi fa certo morta
+  che già di là, mi disse, «e poi si parla»,
+  rispuosi al mio maestro mio, «voi viete».
+
+  E io a lui: «Da tu se’ che tu ridi
+  giù parlarere’ in petto non si sarò,
+  questi sempre ch’io non m’oti mortai».
+
+  Ed elli a me: «A la vostra sì levaro
+  che piange il bocco di del segnon fabbia
+  ch’i’ ho si parlar parl
+```
+
+```
+Nel mezzo del cammin di nostra vita.
+
+  Lo duca mio, ch’era disse: «Propititi
+  nudo briscordo il primo del suo cammino,
+  ma piena che dato è questo cammin vita.
+
+  Questa propria di color che facenno
+  per che da me con lui io sì si fia corte,
+  che le mani ancor di lor mal gran volle,
+```
+
 ## Observations & ideas for a better run
 
 The corpus is small (~hundreds of thousands of characters), so a 10.7M-parameter
