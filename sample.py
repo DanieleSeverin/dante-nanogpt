@@ -90,7 +90,10 @@ def main():
         raise FileNotFoundError(
             f"{ckpt_path} not found. Train a model with `python train.py` first."
         )
-    checkpoint = torch.load(ckpt_path, map_location=device)
+    # weights_only=False because our checkpoint is a dict with more than just
+    # tensors (optimizer state, config, model_args). PyTorch >= 2.6 defaults to
+    # weights_only=True; this file is one we produced ourselves, so it's trusted.
+    checkpoint = torch.load(ckpt_path, map_location=device, weights_only=False)
     gptconf = GPTConfig(**checkpoint["model_args"])
     model = GPT(gptconf)
     state_dict = checkpoint["model"]
