@@ -70,9 +70,15 @@ and do **not** exist in the repo until the scripts are run.
       `ruff check .` -> `ruff format --check .`, triggered on push + PR.)
 - [ ] GitHub Action: CPU smoke test (few steps, tiny config) on push/PR
       (note: same .github/workflows/ permission limitation applies)
-- [ ] Real training run on Colab GPU; save sample generations
-      (e.g. samples/ folder or README section)
-- [ ] (Optional) hyperparameter experiments, document results in README
+- [x] Real training run on Colab GPU; save sample generations
+      (first full T4 run done: 6L/6H/384d, block 256, 5000 iters, float16.
+      Best val loss 1.3538; strong overfitting by the end (train ~0.14 /
+      val ~2.33) on the small corpus, but the saved best checkpoint
+      generalizes fine and produces Dante-style tercets. Results recorded in
+      samples/README.md.)
+- [ ] (Optional) hyperparameter experiments to reduce overfitting
+      (e.g. higher dropout 0.2-0.3, smaller model, fewer iters), document in
+      samples/README.md / README
 
 ## Working agreement
 - Start each session by reading this file and the roadmap
